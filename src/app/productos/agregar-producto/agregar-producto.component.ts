@@ -12,22 +12,39 @@ import { FormsModule } from '@angular/forms';
 })
 export class AgregarProductoComponent {
 
-constructor(private productoService: ProductoService){
+ultimoId: number = 0;
+  productos: Producto[] | undefined;
 
-}
+  constructor(private productoService: ProductoService){}
+    
+  ngOnInit() {
+    this.productos = this.productoService.productos;
+    this.ultimoId = this.productos.length; 
+    }
+  
 
-nuevoProducto: Producto = {
-  nombre: '',
-  descripcion:'',
-  precio: 0
-}
-
-agregar() {
-  this.productoService.agregarCurso(this.nuevoProducto);
-  this.nuevoProducto = {
+  nuevoProducto: Producto = {
+    id: 0,
     nombre: '',
     descripcion:'',
     precio: 0
   }
-}
-}
+
+  agregar() {
+    this.ultimoId++;  
+    this.nuevoProducto.id = this.ultimoId;
+    
+    this.productoService.agregarProducto(this.nuevoProducto);
+    
+    this.nuevoProducto = {
+      id: 0,
+      nombre: '',
+      descripcion:'',
+      precio: 0
+    }
+  }
+  }
+    function ngOnInit() {
+      throw new Error('Function not implemented.');
+    }
+  
