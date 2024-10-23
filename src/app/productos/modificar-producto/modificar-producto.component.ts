@@ -18,8 +18,9 @@ export class ModificarProductoComponent {
     return this.productoService.productos
   }
 
-  modificar() {
-
+  
+  modificar(id: number) {
+    this.productoService.modificarProducto(id);
 }
 
 }
