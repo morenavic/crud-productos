@@ -10,7 +10,5 @@ export const routes: Routes = [
     {path: 'modificar',  component: ModificarProductoComponent},
     // , loadChildren: () => import('./productos/eliminar-producto/eliminar-producto.component').then(e => e.EliminarProductoComponent)
     {path: 'eliminar', component: EliminarProductoComponent},
-    {path: '**', redirectTo: 'listar-productos', pathMatch: 'full'}
-
-    
+    {path: '**', redirectTo: 'listar-productos', pathMatch: 'full'}   
 ];
