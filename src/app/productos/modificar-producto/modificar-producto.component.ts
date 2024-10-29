@@ -23,4 +23,8 @@ export class ModificarProductoComponent {
     this.productoService.modificarProducto(id);
 }
 
+  eliminar(id: number) {
+    this.productoService.eliminarProducto(id);
+  }
+
 }
