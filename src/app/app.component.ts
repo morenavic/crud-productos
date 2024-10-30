@@ -2,10 +2,8 @@ import { Component } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ListarProductosComponent } from './productos/listar-productos/listar-productos.component';
-import { AgregarProductoComponent } from './productos/agregar-producto/agregar-producto.component';
-import { ModificarProductoComponent } from './productos/modificar-producto/modificar-producto.component';
-
-
+import { AgregarModificarProductoComponent } from './productos/agregar-modificar-producto/agregar-modificar-producto.component';
+import { GestionarProductoComponent } from './productos/gestionar-producto/gestionar-producto.component';
 
 @Component({
   selector: 'app-root',
@@ -14,8 +12,8 @@ import { ModificarProductoComponent } from './productos/modificar-producto/modif
     RouterOutlet,
     FormsModule,
     ListarProductosComponent,
-    AgregarProductoComponent,
-    ModificarProductoComponent
+    AgregarModificarProductoComponent,
+    GestionarProductoComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -39,7 +37,4 @@ export class AppComponent {
       this.router.navigate(['/modificar']);
     }
 
-    abrirAgregar() {
-      this.router.navigate(['/agregar']);
-    }
 }
