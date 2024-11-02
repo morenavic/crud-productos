@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Producto } from '../interfaces/producto';
 import { ProductoService } from '../servicios/producto.service';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { NgIf } from '@angular/common';
+import { ListarProductosComponent } from '../listar-productos/listar-productos.component';
 
 @Component({
   selector: 'app-agregar-producto',
@@ -13,62 +14,83 @@ import { NgIf } from '@angular/common';
   styleUrl: './agregar-modificar-producto.component.css'
 })
 
-export class AgregarModificarProductoComponent {
+export class AgregarModificarProductoComponent implements OnInit{
 
-  productos: Producto[] | undefined;
+  productos: Producto[] = [];
   private ultimoId:number=0;
-
   nuevoProducto: Producto = {
     id: 0,
     nombre: '',
     descripcion:'',
     precio: 0
   }
+  formularioProducto: FormGroup;
+  productoEditando: Producto | null = null;
 
-  constructor(private productoService: ProductoService){}
-
+  // reactive forms
+  constructor(
+    private productoService: ProductoService,
+    // inyecto para usar el dormulario reactivo
+    private fb: FormBuilder, private listarProdu: ListarProductosComponent
+  ) { // dentro del mismo constructor colocolo las validaciones
+    this.formularioProducto = this.fb.group({
+      id: [0],
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      precio: [0, [Validators.required, Validators.min(1)]]
+    });
+  }
+  
   ngOnInit() {
     
     const id = this.productoService.getId();
     if (id !== null) {
       this.nuevoProducto.id = id; 
     }
-
-    this.productos = this.productoService.productos;
-    this.ultimoId = this.productoService.productos.length;
+    this.productoService.obtenerProductos().subscribe(data => {
+      this.productos = data;
+  });
+    this.productoService.obtenerProductos().subscribe(data => {
+      this.ultimoId = data.length;
+  });
   }
 
+  editarProducto(producto: Producto): void {
+    this.formularioProducto.patchValue(producto);
+    this.productoEditando = producto;
+  }
 
-  agregar_modificar(id:number) {
-    
-    if(id>0){ // modificar
+  eliminarProducto(id: number): void {
+    // esto es similar al manejo de stream y lambda en Java. La 'promesa' a la que me suscribo 
+    // no es mas que una expresion lambda y el resto son metodos encadenados. 
+    this.productoService.eliminarProducto(id).subscribe(() => this.listarProdu.cargarProductos());
+  }
 
-      const productoModificado: Producto = {
-      id: this.nuevoProducto.id, 
-      nombre: this.nuevoProducto.nombre, 
-      descripcion: this.nuevoProducto.descripcion, 
-      precio: this.nuevoProducto.precio 
-      };
-  
-      this.productoService.modificarProducto(productoModificado.id, productoModificado);
-      alert('El producto con ID('+id+') se modificó correctamente.');
+  cancelarEdicion(): void {
+    this.productoEditando = null;
+    this.formularioProducto.reset({ id: 0, nombre: '', descripcion: '', precio: 0 });
+  }
 
-    }else{ // agregar
-    
-      this.ultimoId++;  
-      this.nuevoProducto.id = this.ultimoId;
-      
-      this.productoService.agregarProducto(this.nuevoProducto);
+  agregar_modificar() {
+    if (this.formularioProducto.valid) {
+      const producto = this.formularioProducto.value;
 
-      this.nuevoProducto = {
-        id: 0,
-        nombre: '',
-        descripcion:'',
-        precio: 0
-    
+      if (producto.id && this.productoEditando) {
+        // Modificar producto
+        this.productoService.modificarProducto(producto).subscribe(() => {
+          this.listarProdu.cargarProductos(); // lo modifica y lo guarda
+          this.cancelarEdicion(); // o se cancela la modificacion y se resetean los valores
+        });
+      } else {
+        // Agregar nuevo producto
+        this.productoService.agregarProducto(producto).subscribe(() => {
+          this.listarProdu.cargarProductos();
+          this.formularioProducto.reset({ id: 0, nombre: '', descripcion: '', precio: 0 });
+        });
       }
-      alert('El producto se agregó correctamente.');
-    }
-    
+    }else{
+      // avisar que se toco el campo - osea no se ingresaron datos pero el usuario toco algo
+      this.formularioProducto.markAsTouched();
+    }    
   }
 }

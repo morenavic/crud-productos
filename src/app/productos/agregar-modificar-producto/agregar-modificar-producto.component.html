@@ -2,7 +2,7 @@
 <h1 *ngIf="nuevoProducto.id>0"> MODIFICAR PRODUCTO </h1>
 <h1 *ngIf="nuevoProducto.id==0"> AGREGAR PRODUCTO </h1>
 <hr>
-<form (submit)="agregar_modificar(nuevoProducto.id)">
+<form (submit)="agregar_modificar()">
     <div class="mb-3">
         <label for="nombre" class="form-label">Nombre</label>
         <input type="text" class="form-control" id="nombre" name="nombre" aria-describedby="emailHelp" 
